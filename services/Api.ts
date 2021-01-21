@@ -5,7 +5,7 @@ const apigee = function(): AxiosInstance {
 
     return axios.create({
         baseURL: baseUrl,
-        timeout: 6000,
+        timeout: 10000,
     });
 };
 
