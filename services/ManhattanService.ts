@@ -1,12 +1,12 @@
 import { apigee } from './Api';
 import { logToTeams } from './TeamsService';
 
+const retry = require('async-retry');
 const teamsUrl = process.env["ERROR_LOGS_URL"];
 
 const getInventoryData = async (context, accessToken, mpns) => {
     try {
         context.log('getInventoryData start');
-
         let config = {
             headers: {
                 'Authorization': `Bearer ${accessToken}`,
@@ -18,14 +18,19 @@ const getInventoryData = async (context, accessToken, mpns) => {
             Items: mpns,
             ViewName: 'Supply~Website'
         };
+        let url = 'v1.1/dom/inventory/api/availability/location/availabilitydetail';
 
-        let invResponse = await apigee()
-            .post('v1.1/dom/inventory/api/availability/location/availabilitydetail', body, config);
+        let inventory = await retry(async () => {
+            let invResponse = await apigee().post(url, body, config);
 
-        context.log(`Response status: ${invResponse.data.statusCode}`);
-        context.log('getInventoryData finish');
+            context.log(`Manhattan response status: ${invResponse.data.statusCode}`);
+            context.log('getInventoryData finish');
 
-        return invResponse.data.data;
+            return invResponse.data.data;
+
+        }, { retries: 5 });
+
+        return inventory;
 
     } catch (e) {
         let title = 'Error in getInventoryData';
