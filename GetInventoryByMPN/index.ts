@@ -10,7 +10,7 @@ const teamsUrl = process.env["ERROR_LOGS_URL"];
 const httpTrigger: AzureFunction = async function (context: Context, req: HttpRequest): Promise<Context["res"]> {
     try {
         context.log('req body ' + JSON.stringify(req.body));
-        let mpns = req.body.masterProductNumbers;
+        let mpns = req.body.MasterProductNumbers;
 
         if(typeof mpns != 'object'){
             return {
