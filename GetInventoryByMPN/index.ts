@@ -10,12 +10,12 @@ const teamsUrl = process.env["ERROR_LOGS_URL"];
 const httpTrigger: AzureFunction = async function (context: Context, req: HttpRequest): Promise<Context["res"]> {
     try {
         context.log('req body ' + JSON.stringify(req.body));
-        let mpns = req.body.masterProductNumbers;
+        let mpns = req.body.MasterProductNumbers;
 
         if(typeof mpns != 'object'){
             return {
                 status: 400,
-                body: 'masterProductNumbers must be an array'
+                body: 'MasterProductNumbers must be an array'
             };
         }
 
@@ -26,7 +26,7 @@ const httpTrigger: AzureFunction = async function (context: Context, req: HttpRe
         if(!validMPNs.length){
             return {
                 status: 400,
-                body: 'masterProductNumbers array is required'
+                body: 'MasterProductNumbers array is required'
             };
         }
 
