@@ -26,10 +26,10 @@ const requestNewApigeeToken = async (context): Promise<Creds> => {
         }, { retries: 5 });
 
         // Unix timestamp when the token was issued
-        let accessTokenIssuedAt = new Date(parseInt(apigeeResponse.data.issued_at));
+        let accessTokenIssuedAt = new Date(+apigeeResponse.data.issued_at);
 
         // Add number of seconds that the token will expire in to the issuedAt date to get the time when the token will expire
-        let accessTokenExpiresIn = apigeeResponse.data.expires_in;
+        let accessTokenExpiresIn: number = apigeeResponse.data.expires_in;
         let accessTokenExpiresAt = accessTokenIssuedAt.setSeconds(accessTokenExpiresIn);
 
         context.log('requestNewApigeeToken finish');

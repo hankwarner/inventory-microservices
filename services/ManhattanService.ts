@@ -50,7 +50,7 @@ const parseInventoryResponse = async (inventoryResponse, mpns) => {
     inventoryResponse.forEach(invLine => {
         let mpn = invLine.ItemId;
         let branch = parseLocationId(invLine.LocationId);
-        let qty = parseInt(invLine.Quantity);
+        let qty = +invLine.Quantity;
 
         inventory[mpn][branch] = qty;
     });
