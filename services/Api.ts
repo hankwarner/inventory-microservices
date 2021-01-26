@@ -1,6 +1,6 @@
-import axios, { AxiosInstance } from 'axios';
+import axios from 'axios';
 
-const apigee = function(): AxiosInstance {
+const apigee = function() {
     var baseUrl = 'https://api2.ferguson.com/';
 
     return axios.create({
@@ -9,7 +9,7 @@ const apigee = function(): AxiosInstance {
     });
 };
 
-const microsoft = function(): AxiosInstance {
+const microsoft = function() {
     var baseUrl = 'https://mydigitalspace.webhook.office.com/';
 
     return axios.create({

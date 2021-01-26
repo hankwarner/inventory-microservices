@@ -1,4 +1,4 @@
-export class Creds {
+export class ApigeeCreds {
     accessToken: string;
     accessTokenExpiresAt: number;
 

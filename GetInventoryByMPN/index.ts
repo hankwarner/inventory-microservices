@@ -1,16 +1,16 @@
-import { AzureFunction, Context, HttpRequest } from '@azure/functions';
+import { AzureFunction, Context, HttpRequest, Response } from '@azure/functions';
 import { requestNewApigeeToken } from '../services/AuthenticationService';
 import { getInventoryData, parseInventoryResponse } from '../services/ManhattanService';
-import { Creds } from '../models/Creds';
+import { ApigeeCreds } from '../models/ApigeeCreds';
 import { logToTeams } from '../services/TeamsService';
 
-let creds = new Creds();
+let creds = new ApigeeCreds();
 const teamsUrl = process.env["ERROR_LOGS_URL"];
 
-const httpTrigger: AzureFunction = async function (context: Context, req: HttpRequest): Promise<Context["res"]> {
+const httpTrigger: AzureFunction = async function (context: Context, req: HttpRequest): Promise<Response> {
     try {
         context.log('req body ' + JSON.stringify(req.body));
-        let mpns = req.body.MasterProductNumbers;
+        let mpns: string[] = req.body.MasterProductNumbers;
 
         if(typeof mpns != 'object'){
             return {
@@ -51,7 +51,7 @@ const httpTrigger: AzureFunction = async function (context: Context, req: HttpRe
 
     } catch (e) {
         let title = 'Error in GetInventoryByMPN';
-        context.log(`${title}: ${e}`);
+        context.log.error(`${title}: ${e}`);
         logToTeams(title, `${e.message}. Stacktrace: ${e.stack}`, 'red', teamsUrl);
 
         return {
