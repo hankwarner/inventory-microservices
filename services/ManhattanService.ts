@@ -1,12 +1,32 @@
+import { Context } from '@azure/functions';
 import { apigee } from './Api';
 import { logToTeams } from './TeamsService';
 
+const retry = require('async-retry');
 const teamsUrl = process.env["ERROR_LOGS_URL"];
 
-const getInventoryData = async (context, accessToken, mpns) => {
+interface InventoryResponse {
+    data: {
+        statusCode: string;
+        data: ItemData[]
+    }
+}
+
+interface ItemData {
+    ItemId: string;
+    LocationId: string;
+    Quantity: number;
+}
+
+interface Inventory {
+    [key: string]: {
+        [key: string]: number
+    };
+}
+
+const getInventoryData = async (context: Context, accessToken: string, mpns: string[]) => {
     try {
         context.log('getInventoryData start');
-
         let config = {
             headers: {
                 'Authorization': `Bearer ${accessToken}`,
@@ -18,25 +38,30 @@ const getInventoryData = async (context, accessToken, mpns) => {
             Items: mpns,
             ViewName: 'Supply~Website'
         };
+        let url = 'v1.1/dom/inventory/api/availability/location/availabilitydetail';
 
-        let invResponse = await apigee()
-            .post('v1.1/dom/inventory/api/availability/location/availabilitydetail', body, config);
+        let inventory: ItemData[] = await retry(async () => {
+            let invResponse: InventoryResponse = await apigee().post(url, body, config);
 
-        context.log(`Response status: ${invResponse.data.statusCode}`);
-        context.log('getInventoryData finish');
+            context.log(`Manhattan response status: ${invResponse.data.statusCode}`);
+            context.log('getInventoryData finish');
 
-        return invResponse.data.data;
+            return invResponse.data.data;
+
+        }, { retries: 5 });
+
+        return inventory;
 
     } catch (e) {
         let title = 'Error in getInventoryData';
-        context.log(`${title}: ${e}`);
+        context.log.error(`${title}: ${e}`);
         logToTeams(title, `${e.message}. Stacktrace: ${e.stack}`, 'red', teamsUrl);
         throw e;
     }
 }
 
-const parseInventoryResponse = async (inventoryResponse, mpns) => {
-    let inventory = {};
+const parseInventoryResponse = async (inventoryResponse: ItemData[], mpns: string[]) => {
+    let inventory: Inventory = {};
 
     // Add mpns to inventory object
     mpns.forEach(mpn => inventory[mpn] = {});
@@ -45,7 +70,7 @@ const parseInventoryResponse = async (inventoryResponse, mpns) => {
     inventoryResponse.forEach(invLine => {
         let mpn = invLine.ItemId;
         let branch = parseLocationId(invLine.LocationId);
-        let qty = parseInt(invLine.Quantity);
+        let qty = +invLine.Quantity;
 
         inventory[mpn][branch] = qty;
     });
@@ -54,10 +79,10 @@ const parseInventoryResponse = async (inventoryResponse, mpns) => {
 }
 
 // Parses the LocationId in format 'TR~W~####' and returns the branch number
-const parseLocationId = (locationId) => {
-    var loctionArr = locationId.split('~');
+const parseLocationId = (locationId: string) => {
+    let loctionArr = locationId.split('~');
 
     return loctionArr[loctionArr.length - 1];
 }
 
-export { getInventoryData, parseInventoryResponse };
+export { getInventoryData, parseInventoryResponse, Inventory };
