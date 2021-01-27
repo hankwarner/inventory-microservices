@@ -24,14 +24,13 @@ interface Inventory {
     };
 }
 
-const getInventoryData = async (context: Context, accessToken: string, mpns: string[]) => {
+const getInventoryData = async (accessToken: string, mpns: string[], context?: Context) => {
     try {
-        context.log('getInventoryData start');
+        context?.log('getInventoryData start');
         let config = {
             headers: {
                 'Authorization': `Bearer ${accessToken}`,
-                'Content-Type': 'application/json',
-                'Content-Length': 'application/json'
+                'Content-Type': 'application/json'
             }
         };
         let body = {
@@ -43,8 +42,8 @@ const getInventoryData = async (context: Context, accessToken: string, mpns: str
         let inventory: ItemData[] = await retry(async () => {
             let invResponse: InventoryResponse = await apigee().post(url, body, config);
 
-            context.log(`Manhattan response status: ${invResponse.data.statusCode}`);
-            context.log('getInventoryData finish');
+            context?.log(`Manhattan response status: ${invResponse.data.statusCode}`);
+            context?.log('getInventoryData finish');
 
             return invResponse.data.data;
 
@@ -54,7 +53,7 @@ const getInventoryData = async (context: Context, accessToken: string, mpns: str
 
     } catch (e) {
         let title = 'Error in getInventoryData';
-        context.log.error(`${title}: ${e}`);
+        context?.log.error(`${title}: ${e}`);
         logToTeams(title, `${e.message}. Stacktrace: ${e.stack}`, 'red', teamsUrl);
         throw e;
     }
@@ -85,4 +84,4 @@ const parseLocationId = (locationId: string) => {
     return loctionArr[loctionArr.length - 1];
 }
 
-export { getInventoryData, parseInventoryResponse, Inventory };
+export { getInventoryData, parseInventoryResponse, parseLocationId, Inventory };
