@@ -14,9 +14,9 @@ interface AuthResponse {
     }
 }
 
-const requestNewApigeeToken = async (context: Context) => {
+const requestNewApigeeToken = async (context?: Context) => {
     try {
-        context.log('requestNewApigeeToken start');
+        context?.log('requestNewApigeeToken start');
 
         let params = new URLSearchParams();
         params.append('grant_type', 'password');
@@ -41,7 +41,7 @@ const requestNewApigeeToken = async (context: Context) => {
         let accessTokenExpiresIn = apigeeResponse.data.expires_in;
         let accessTokenExpiresAt = accessTokenIssuedAt.setSeconds(+accessTokenExpiresIn);
 
-        context.log('requestNewApigeeToken finish');
+        context?.log('requestNewApigeeToken finish');
 
         return new ApigeeCreds(apigeeResponse.data.access_token, accessTokenExpiresAt);
         

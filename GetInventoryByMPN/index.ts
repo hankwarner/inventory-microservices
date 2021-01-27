@@ -1,15 +1,23 @@
-import { AzureFunction, Context, HttpRequest, Response } from '@azure/functions';
+import { AzureFunction, Context, HttpRequest } from '@azure/functions';
 import { requestNewApigeeToken } from '../services/AuthenticationService';
-import { getInventoryData, parseInventoryResponse } from '../services/ManhattanService';
+import { getInventoryData, parseInventoryResponse, Inventory } from '../services/ManhattanService';
 import { ApigeeCreds } from '../models/ApigeeCreds';
 import { logToTeams } from '../services/TeamsService';
 
 let creds = new ApigeeCreds();
 const teamsUrl = process.env["ERROR_LOGS_URL"];
 
+interface Response {
+    status: number;
+    headers?: {
+      [key: string]: string
+    }
+    body: Inventory | string;
+}
+
 const httpTrigger: AzureFunction = async function (context: Context, req: HttpRequest): Promise<Response> {
     try {
-        context.log('req body ' + JSON.stringify(req.body));
+        context.log('request body ' + JSON.stringify(req.body));
         let mpns: string[] = req.body.MasterProductNumbers;
 
         if(typeof mpns != 'object'){
@@ -36,7 +44,7 @@ const httpTrigger: AzureFunction = async function (context: Context, req: HttpRe
         }
 
         // Send inventory request to Manhattan
-        const inventoryResponse = await getInventoryData(context, creds.accessToken, validMPNs);
+        const inventoryResponse = await getInventoryData(creds.accessToken, validMPNs, context);
 
         // // Parse response into JS object
         const inventory = await parseInventoryResponse(inventoryResponse, validMPNs);
@@ -44,6 +52,7 @@ const httpTrigger: AzureFunction = async function (context: Context, req: HttpRe
 
         return {
             body: inventory,
+            status: 200,
             headers: {
                 'Content-Type': 'application/json'
             }
