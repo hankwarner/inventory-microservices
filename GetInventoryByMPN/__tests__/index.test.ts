@@ -1,11 +1,21 @@
 import httpTrigger from '../index';
 import mockedRequestFactory from '../utils/MockedRequestFactory';
 
-const config = require('../../local.settings.json');
+let configValues;
+console.log(process.env.NODE_ENV);
+console.log(process.env.CONFIG_VALUES);
 
 // Assigns env variables in local.settings.json to process.env
+if(process.env.NODE_ENV == 'test'){
+    const config = require('../../local.settings.json');
+    configValues = config.Values;
+
+} else {
+    configValues = process.env.CONFIG_VALUES;
+}
+console.log(configValues);
 beforeAll(() => {
-    process.env = Object.assign(process.env, {...config.Values});
+    process.env = Object.assign(process.env, configValues);
 });
 
 describe('Get inventory by Master Product Number', () => {
