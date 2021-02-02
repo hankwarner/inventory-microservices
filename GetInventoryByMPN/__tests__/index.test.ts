@@ -2,17 +2,13 @@ import httpTrigger from '../index';
 import mockedRequestFactory from '../utils/MockedRequestFactory';
 
 // Assigns env variables in local.settings.json to process.env
-let configValues;
 if(process.env.NODE_ENV == 'test'){
-    configValues = require('../../local.settings.json').Values;
+    let configValues = require('../../local.settings.json').Values;
 
-} else { // use values set in Github secrets
-    configValues = process.env.CONFIG_VALUES;
+    beforeAll(() => {
+        process.env = Object.assign(process.env, configValues);
+    });
 }
-console.log('configValues ' + JSON.stringify(configValues));
-beforeAll(() => {
-    process.env = Object.assign(process.env, configValues);
-});
 
 describe('Get inventory by Master Product Number', () => {
     it('fails if no MPNs provided.', async () => {

@@ -8,6 +8,10 @@ env:
   AZURE_FUNCTIONAPP_NAME: inventory-microservice-test
   AZURE_FUNCTIONAPP_PACKAGE_PATH: '.'    # set this to the path to your web app project, defaults to the repository root
   NODE_VERSION: '12.x'
+  ENCODED_CREDS: ${{ secrets.ENCODED_CREDS }}
+  ERROR_LOGS_URL: ${{ secrets.ERROR_LOGS_URL }}
+  GRANT_PW: ${{ secrets.GRANT_PW }}
+  GRANT_USER: ${{ secrets.GRANT_USER }}
 
 jobs:
   build-and-deploy:
