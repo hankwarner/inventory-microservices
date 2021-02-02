@@ -1,19 +1,15 @@
 import httpTrigger from '../index';
 import mockedRequestFactory from '../utils/MockedRequestFactory';
 
-let configValues;
-console.log(process.env.NODE_ENV);
-console.log(process.env.CONFIG_VALUES);
-
 // Assigns env variables in local.settings.json to process.env
+let configValues;
 if(process.env.NODE_ENV == 'test'){
-    const config = require('../../local.settings.json');
-    configValues = config.Values;
+    configValues = require('../../local.settings.json').Values;
 
-} else {
+} else { // use values set in Github secrets
     configValues = process.env.CONFIG_VALUES;
 }
-console.log(configValues);
+
 beforeAll(() => {
     process.env = Object.assign(process.env, configValues);
 });
