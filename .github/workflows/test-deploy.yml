@@ -39,12 +39,11 @@ jobs:
       run: npm run test --if-present
       env:
         NODE_ENV: 'test deploy'
-        CONFIG_VALUES: ${{ secrets.CONFIG_VALUES }}
         
     - name: 'Run Azure Functions Action'
       uses: Azure/functions-action@v1
       id: fa
       with:
         app-name: ${{ env.AZURE_FUNCTIONAPP_NAME }}
-        package: '${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}/output'
+        package: '${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}/dist'
         publish-profile: ${{ secrets.AZURE_FUNCTIONAPP_PUBLISH_PROFILE_TEST }}
