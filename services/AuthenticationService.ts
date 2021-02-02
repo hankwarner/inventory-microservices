@@ -29,6 +29,7 @@ const requestNewApigeeToken = async (context?: Context) => {
                 'Content-Type': 'application/x-www-form-urlencoded'
             }
         };
+        context?.log('config ' + config);
 
         let apigeeResponse: AuthResponse = await retry(async () => {
             return await apigee().post('v1/manh-idp/token', params, config);
