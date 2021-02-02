@@ -1,13 +1,16 @@
 import { getInventoryData, parseLocationId, parseInventoryResponse, Inventory } from '../ManhattanService';
 import { requestNewApigeeToken } from '../AuthenticationService';
 
-const config = require('../../local.settings.json');
 const mpns = ['789420'];
 
 // Assigns env variables in local.settings.json to process.env
-beforeAll(() => {
-    process.env = Object.assign(process.env, {...config.Values});
-});
+if(process.env.NODE_ENV == 'test'){
+    let configValues = require('../../local.settings.json').Values;
+
+    beforeAll(() => {
+        process.env = Object.assign(process.env, configValues);
+    });
+}
 
 describe('Get inventory data by branch number', () => {
     it('will parse a branch number from locationId string.', () => {

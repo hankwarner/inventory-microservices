@@ -1,12 +1,14 @@
 import httpTrigger from '../index';
 import mockedRequestFactory from '../utils/MockedRequestFactory';
 
-const config = require('../../local.settings.json');
-
 // Assigns env variables in local.settings.json to process.env
-beforeAll(() => {
-    process.env = Object.assign(process.env, {...config.Values});
-});
+if(process.env.NODE_ENV == 'test'){
+    let configValues = require('../../local.settings.json').Values;
+
+    beforeAll(() => {
+        process.env = Object.assign(process.env, configValues);
+    });
+}
 
 describe('Get inventory by Master Product Number', () => {
     it('fails if no MPNs provided.', async () => {
