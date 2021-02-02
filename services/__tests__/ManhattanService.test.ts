@@ -11,7 +11,7 @@ if(process.env.NODE_ENV == 'test'){
 } else { // use values set in Github secrets
     configValues = process.env.CONFIG_VALUES;
 }
-
+console.log(configValues);
 beforeAll(() => {
     process.env = Object.assign(process.env, configValues);
 });
