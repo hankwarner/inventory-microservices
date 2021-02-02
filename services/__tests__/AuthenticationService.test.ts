@@ -1,11 +1,13 @@
 import { requestNewApigeeToken } from '../AuthenticationService';
 
-const config = require('../../local.settings.json');
-
 // Assigns env variables in local.settings.json to process.env
-beforeAll(() => {
-    process.env = Object.assign(process.env, {...config.Values});
-});
+if(process.env.NODE_ENV == 'test'){
+    let configValues = require('../../local.settings.json').Values;
+
+    beforeAll(() => {
+        process.env = Object.assign(process.env, configValues);
+    });
+}
 
 describe('Get Apigee credentials', () => {
 
