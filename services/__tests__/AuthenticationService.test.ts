@@ -1,17 +1,13 @@
 import { requestNewApigeeToken } from '../AuthenticationService';
 
 // Assigns env variables in local.settings.json to process.env
-let configValues;
 if(process.env.NODE_ENV == 'test'){
-    configValues = require('../../local.settings.json').Values;
+    let configValues = require('../../local.settings.json').Values;
 
-} else { // use values set in Github secrets
-    configValues = process.env.CONFIG_VALUES;
+    beforeAll(() => {
+        process.env = Object.assign(process.env, configValues);
+    });
 }
-console.log(configValues);
-beforeAll(() => {
-    process.env = Object.assign(process.env, configValues);
-});
 
 describe('Get Apigee credentials', () => {
 
